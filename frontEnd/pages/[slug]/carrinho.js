@@ -34,9 +34,30 @@ export default function CarrinhoCliente({ empresaId }) {
     fetchCarrinho();
   },  [slug]);
 
-  const handleFinalizarCompra = () => {
-    alert("Compra finalizada!"); // Substituir por lógica real
+  const handleFinalizarCompra = async () => {
+    try {
+      const response = await fetch(`http://localhost:4000/${slug}/finalizar-compra`, {
+        method: 'POST',
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("Erro da API:", data);
+        throw new Error(data.erro || "Erro ao finalizar compra");
+      }
+
+      alert("Compra finalizada com sucesso!");
+      setItensCarrinho([]);
+      setSubtotal(0);
+      router.push(`/${slug}`);
+    } catch (error) {
+      console.error("Erro ao finalizar compra:", error);
+      alert("Ocorreu um erro ao finalizar a compra.");
+    }
   };
+
+
 
   const handleRemoverItem = async (id) => {
     try {
