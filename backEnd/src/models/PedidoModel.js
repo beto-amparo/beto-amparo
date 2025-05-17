@@ -7,8 +7,6 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY
 
 export async function buscarPedidosPorSlug(slug) {
   // Busca a loja com base no slug_loja
-  console.log('Buscando loja com slug:', slug);
-
   const { data: loja, error: lojaError } = await supabase
     .from('loja')
     .select('id')
@@ -18,13 +16,36 @@ export async function buscarPedidosPorSlug(slug) {
   if (lojaError) throw lojaError;
   if (!loja) throw new Error('Loja não encontrada');
 
-  // Busca os pedidos associados ao id da loja
+  // Busca os pedidos da loja
   const { data: pedidos, error: pedidosError } = await supabase
     .from('pedidos')
-    .select('*')
+    .select('id, data, total, status, observacoes')
     .eq('id_loja', loja.id);
 
   if (pedidosError) throw pedidosError;
 
-  return pedidos;
+  // Para cada pedido, buscar os produtos associados
+  const pedidosComProdutos = await Promise.all(pedidos.map(async (pedido) => {
+    const { data: itens, error: itensError } = await supabase
+      .from('pedido_itens')
+      .select(`
+        quantidade,
+        preco_unitario,
+        produto:produto_id ( id, nome )
+      `)
+      .eq('pedido_id', pedido.id);
+
+    if (itensError) throw itensError;
+
+    return {
+      ...pedido,
+      produtos: itens.map((item) => ({
+        nome: item.produto.nome,
+        quantidade: item.quantidade,
+        preco_unitario: item.preco_unitario,
+      }))
+    };
+  }));
+
+  return pedidosComProdutos;
 }

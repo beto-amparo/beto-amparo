@@ -108,6 +108,8 @@ const getImagemProduto = (caminhoImagem) => {
    const handleAdicionar = async (produto) => {
     try {
       const qtd = quantidades[produto.id] || 1;
+      const id_cliente = 2; 
+
       console.log(`Adicionando ${qtd}x ${produto.nome} ao carrinho...`);
   
       const response = await fetch('http://localhost:4000/api/carrinho', {
@@ -118,6 +120,8 @@ const getImagemProduto = (caminhoImagem) => {
         body: JSON.stringify({
           produtoId: produto.id,
           quantidade: qtd,
+          id_cliente,
+          id_empresa: empresaId,
         }),
       });
   
