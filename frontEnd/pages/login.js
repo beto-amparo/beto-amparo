@@ -1,49 +1,60 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    email: '',
-    senha: ''
-  });
+  const [formData, setFormData] = useState({ email: '', senha: '' });
   const [erros, setErros] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const GOOGLE_CLIENT_ID = '277563786408-nma21jeiioon8q6312jru46vl521qjc2.apps.googleusercontent.com';
+
+  useEffect(() => {
+    const loadGoogleScript = () => {
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
+      script.onload = () => {
+        window.google.accounts.id.initialize({
+          client_id: GOOGLE_CLIENT_ID,
+          callback: handleGoogleCallback,
+        });
+        window.google.accounts.id.renderButton(
+          document.getElementById('googleLoginDiv'),
+          { theme: 'outline', size: 'large', width: '100%' }
+        );
+      };
+      document.body.appendChild(script);
+    };
+
+    if (!window.google) loadGoogleScript();
+  }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     setErros([]);
-    
+
     try {
       const response = await fetch('http://localhost:4000/api/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
-      
+
       const data = await response.json();
-      
+
       if (response.ok) {
-        // Salva o token JWT (se sua API retornar um)
-        if (data.token) {
-          localStorage.setItem('token', data.token);
-        }
-        
-        // Redireciona para a página inicial ou dashboard
+        if (data.token) localStorage.setItem('token', data.token);
         router.push('/');
       } else {
         setErros(data.erros || [data.error || 'E-mail ou senha incorretos']);
@@ -55,11 +66,31 @@ export default function LoginPage() {
     }
   };
 
+  const handleGoogleCallback = async (response) => {
+    const credential = response.credential;
+    try {
+      const res = await fetch('http://localhost:4000/api/login/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken: credential }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        if (data.token) localStorage.setItem('token', data.token);
+        router.push('/');
+      } else {
+        setErros([data.error || 'Falha no login com Google']);
+      }
+    } catch (err) {
+      setErros(['Erro ao tentar autenticar com o Google']);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-blue-50 bg-opacity-60 backdrop-blur-sm">
-      {/* Container principal */}
       <div className="flex max-w-4xl w-full bg-white rounded-xl shadow-lg overflow-hidden">
-        {/* Lado esquerdo - Imagem ilustrativa */}
         <div className="hidden md:block md:w-1/2 bg-blue-600 relative">
           <Image
             src="/pexels-markusspiske-6502328.jpg"
@@ -74,31 +105,24 @@ export default function LoginPage() {
             </h2>
           </div>
         </div>
-        
-        {/* Lado direito - Formulário de login */}
+
         <div className="w-full md:w-1/2 p-8">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-800">Faça seu login</h1>
-            <p className="text-gray-600 mt-2">
-              Acesse sua conta para continuar
-            </p>
+            <p className="text-gray-600 mt-2">Acesse sua conta para continuar</p>
           </div>
-          
+
           {erros.length > 0 && (
             <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700">
               <ul className="list-disc pl-5">
-                {erros.map((erro, index) => (
-                  <li key={index}>{erro}</li>
-                ))}
+                {erros.map((erro, index) => <li key={index}>{erro}</li>)}
               </ul>
             </div>
           )}
-          
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                E-mail *
-              </label>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">E-mail *</label>
               <input
                 type="email"
                 id="email"
@@ -110,11 +134,9 @@ export default function LoginPage() {
                 placeholder="seu@email.com"
               />
             </div>
-            
+
             <div>
-              <label htmlFor="senha" className="block text-sm font-medium text-gray-700">
-                Senha *
-              </label>
+              <label htmlFor="senha" className="block text-sm font-medium text-gray-700">Senha *</label>
               <input
                 type="password"
                 id="senha"
@@ -127,7 +149,7 @@ export default function LoginPage() {
                 placeholder="••••••"
               />
             </div>
-            
+
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <input
@@ -136,18 +158,16 @@ export default function LoginPage() {
                   type="checkbox"
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
-                <label htmlFor="lembrar-me" className="ml-2 block text-sm text-gray-700">
-                  Lembrar de mim
-                </label>
+                <label htmlFor="lembrar-me" className="ml-2 block text-sm text-gray-700">Lembrar de mim</label>
               </div>
-              
+
               <div className="text-sm">
                 <a href="/recuperar-senha" className="font-medium text-blue-600 hover:text-blue-500">
                   Esqueceu sua senha?
                 </a>
               </div>
             </div>
-            
+
             <div>
               <button
                 type="submit"
@@ -158,7 +178,11 @@ export default function LoginPage() {
               </button>
             </div>
           </form>
-          
+
+          <div className="mt-4">
+            <div id="googleLoginDiv" className="flex justify-center" />
+          </div>
+
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Não tem uma conta?{' '}

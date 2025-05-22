@@ -11,6 +11,6 @@ router.use((req, res, next) => {
 
 // Rota para autenticação
 router.post('/login', loginController.autenticar);
-
+router.post('/login/google', loginController.loginComGoogle);
 // Exportação ES Module
 export default router;
