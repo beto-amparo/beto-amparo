@@ -47,7 +47,7 @@ export default function AdminProductCard({ produto, getImagemProduto, onEdit, on
         <h3 className="text-xl font-semibold text-gray-900 mb-2 truncate" title={produto.nome}>
           {produto.nome || 'Produto sem Nome'}
         </h3>
-        <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+        <p className="text-sm text-gray-600 mb-3 line-clamp-1">
           {produto.descricao || 'Nenhuma descrição disponível.'}
         </p>
         <p className="text-2xl font-bold text-green-700 mt-auto">

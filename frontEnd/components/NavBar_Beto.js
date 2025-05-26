@@ -41,7 +41,7 @@ export default function Navbar() {
             <Image src="/icons/help.svg" alt="Suporte" width={20} height={20} />
             Suporte
           </Link>
-          <Link href="/login" passHref>
+          <Link href="/loginEmpresa" passHref>
             <button className="bg-[#3681B6] text-white px-4 py-2 rounded-md font-semibold hover:opacity-90 transition">
               Login
             </button>
@@ -81,7 +81,7 @@ export default function Navbar() {
             </Link>
           </nav>
 
-          <Link href="/login" passHref>
+          <Link href="/loginEmpresa" passHref>
             <button className="mt-auto self-center bg-[#3681B6] text-white px-8 py-2 rounded-md font-semibold hover:opacity-90 transition w-full max-w-[280px]">
               Login
             </button>

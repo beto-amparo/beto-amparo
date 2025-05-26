@@ -38,7 +38,7 @@ export default function LoginEmpresa() {
                 redirectPath = `/empresa/${slugLoja}/dashboard`;
             } else {
                 // Último fallback, se nada se aplicar
-                redirectPath = '/empresa/loginEmpresa'; 
+                redirectPath = '/empresa/${slugLoja}/donoarea'; 
             }
 
             console.log('LoginEmpresa - useEffect: Redirecionando APÓS LOGIN para:', redirectPath);
