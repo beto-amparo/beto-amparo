@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import Image from 'next/image';
 
 import FloatingNotificationsTop from '@/components/notification'; 
-
+import OwnerSidebar from '@/components/OwnerSidebar';
 export default function OwnerDono() {
     const router = useRouter();
 
@@ -89,56 +89,9 @@ export default function OwnerDono() {
                     <span className="font-bold text-lg">BETO Amparo</span>
                 </div>
             </div>
+            <OwnerSidebar>
 
-            <aside
-                className={`
-                    fixed md:static z-40 bg-[#3681B6] text-white w-64 min-h-screen p-4 flex flex-col justify-between
-                    transition-transform duration-300
-                    ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0
-                `}
-            >
-                <div>
-                    <div className="flex justify-end md:hidden mb-4">
-                        <button onClick={() => setSidebarOpen(false)} className="text-white">
-                            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-
-                    <div className="flex items-center mb-4">
-                        <Image src="/logo.png" alt="Logo" width={40} height={40} className="mr-2" />
-                        <div className="leading-tight text-lg">
-                            <span className="font-bold">BETO</span>{' '}
-                            <span className="font-normal">Amparo</span>
-                        </div>
-                    </div>
-
-                    <div className="flex flex-col gap-4">
-                        <NavItem icon="/icons/store_white.svg" label="Área do dono" path={`/empresa/${donoData.loja.slug_loja}/donoarea`} />
-                        <NavItem icon="/icons/dashboard_white.svg" label="Dashboard" path={`/empresa/${donoData.loja.slug_loja}/dashboard`} />
-                        <NavItem icon="/icons/add_white.svg" label="Adicionar Produtos" path={`/empresa/${donoData.loja.slug_loja}/AdicionarProduto`} />
-                        <NavItem icon="/icons/notification_white.svg" label="Notificações" path={`/empresa/${donoData.loja.slug_loja}/notificacoes`} />
-                        <NavItem icon="/icons/paint_white.svg" label="Personalizar Loja" path={`/empresa/${donoData.loja.slug_loja}/personalizacao-loja`} />
-                        <NavItem icon="/icons/help_white.svg" label="Suporte" path={`/empresa/${donoData.loja.slug_loja}/suporte`} />
-                    </div>
-                </div>
-
-                <button
-                    onClick={async () => {
-                        try {
-                            await fetch('/api/logout', { method: 'POST', credentials: 'include' });
-                        } catch (error) {
-                            console.error('Erro ao fazer logout:', error);
-                        } finally {
-                            router.push('/loginEmpresa');
-                        }
-                    }}
-                    className="bg-orange-400 hover:bg-orange-500 p-2 rounded text-white mt-4"
-                >
-                    SAIR
-                </button>
-            </aside>
+            </OwnerSidebar>
 
             <main className="flex-1 bg-gray-100 p-6 md:p-8">
 
