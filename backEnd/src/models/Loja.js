@@ -118,7 +118,7 @@ export async function buscarLojaPorSlugCompleta(slug) {
 
         const { data, error } = await supabase
             .from('loja')
-            .select('id, nome_fantasia, slug_loja, id_empresa, foto_loja, cor_primaria, cor_secundaria, slogan') // <-- VERIFIQUE SE TODOS ESSES CAMPOS EXISTEM NA SUA TABELA DO SUPABASE
+            .select('id, nome_fantasia, slug_loja, id_empresa, foto_loja, cor_primaria, cor_secundaria, slogan, banner') // <-- VERIFIQUE SE TODOS ESSES CAMPOS EXISTEM NA SUA TABELA DO SUPABASE
             .eq('slug_loja', slug)
             .single();
 
