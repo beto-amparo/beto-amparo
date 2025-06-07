@@ -39,11 +39,11 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="flex justify-between items-center p-4 lg:px-12 lg:py-4">
+      <header className="flex justify-between items-center p-4 lg:px-12 lg:py-0">
         <div className="flex items-center gap-2 lg:gap-4">
-          <Image src="/logo.png" alt="Logo" width={60} height={60} />
+          <Image src="/logo.svg" alt="Logo" width={50} height={50} />
           <div className="hidden lg:block">
-            <Image src="/name.png" alt="Nome" width={140} height={60} />
+            <Image src="/name.svg" alt="Nome" width={100} height={100} />
           </div>
         </div>
 
@@ -55,14 +55,14 @@ export default function Navbar() {
           <Image src="/icons/menu_icon.svg" alt="Menu" width={24} height={24} />
         </button>
 
-        <nav className="hidden lg:flex items-center gap-8 text-sm text-[#0F1D2A]">
+        <nav className="hidden lg:flex items-center gap-4 text-sm text-[#0F1D2A]">
           <Link href="/" className="hover:underline flex items-center gap-2">
             <Image src="/icons/home.svg" alt="Home" width={20} height={20} />
             Home
           </Link>
-          <Link href="/sobre" className="hover:underline flex items-center gap-2">
-            <Image src="/icons/info.svg" alt="Sobre" width={20} height={20} />
-            Sobre
+          <Link href="/empresa/donoarea" className="hover:underline flex items-center gap-2">
+            <Image src="/icons/store_black.svg" alt="Sobre" width={20} height={20} />
+            Área do Dono
           </Link>
           <Link href="/planos" className="hover:underline flex items-center gap-2">
             <Image src="/icons/plan.svg" alt="Planos" width={20} height={20} />
@@ -101,8 +101,8 @@ export default function Navbar() {
           </button>
 
           <div className="flex items-center gap-2">
-            <Image src="/logo.png" alt="Logo" width={40} height={40} />
-            <Image src="/name.png" alt="Logo" width={120} height={120} />
+            <Image src="/logo.svg" alt="Logo" width={40} height={40} />
+            <Image src="/name.svg" alt="Logo" width={120} height={120} />
           </div>
 
           <nav className="flex flex-col gap-4 mt-4 text-sm text-[#0F1D2A]">
@@ -110,9 +110,9 @@ export default function Navbar() {
               <Image src="/icons/home.svg" alt="Home" width={20} height={20} />
               Home
             </Link>
-            <Link href="/sobre" className="flex items-center gap-2 hover:underline">
-              <Image src="/icons/info.svg" alt="Sobre" width={20} height={20} />
-              Sobre
+            <Link href="/empresa/donoarea" className="flex items-center gap-2 hover:underline">
+              <Image src="/icons/store_black.svg" alt="Sobre" width={20} height={20} />
+              Área do Dono
             </Link>
             <Link href="/planos" className="flex items-center gap-2 hover:underline">
               <Image src="/icons/plan.svg" alt="Planos" width={20} height={20} />
