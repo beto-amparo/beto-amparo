@@ -39,6 +39,15 @@ router.use((req, res, next) => {
   next();
 });
 
+router.get('/me', clientePrivate, async (req, res) => {
+  try {
+    res.status(200).json({ cliente: req.user });
+  } catch (error) {
+    console.error('Erro ao obter cliente autenticado:', error);
+    res.status(500).json({ error: 'Erro interno ao obter cliente autenticado' });
+  }
+});
+
 
 router.post('/login', AuthClinteController.login); 
 router.post('/clientes', AuthClinteController.cadastrar); 
