@@ -67,10 +67,15 @@ export default function Pedidos() {
 
 		async function fetchPedidos() {
 			try {
-				const res = await fetch(`${process.env.NEXT_PUBLIC_EMPRESA_API}/${slug}/pedidos?cliente_id=${cliente.id}`, {
-					method: "GET",
-					credentials: 'include',
-				});
+        // Ajuste a URL para usar o ID do cliente como parte do caminho
+        const url = `${process.env.NEXT_PUBLIC_EMPRESA_API}/loja/${slug}/pedidos/cliente/${cliente.id}`;
+        
+        console.log("Frontend: Chamando API de pedidos:", url); // Ótimo para depuração
+
+        const res = await fetch(url, {
+          method: "GET",
+          credentials: 'include', // Mantém o envio de cookies para autenticação
+        });
 				if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
 				const data = await res.json();
 				setPedidos(data);
