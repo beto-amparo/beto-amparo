@@ -113,7 +113,7 @@ export default function CarrinhoCliente({ empresaId }) {
   const handleFinalizarCompra = async () => {
   try {
     const id_cliente = cliente?.id;
-    const dataPedido = new Date().toLocaleDateString('pt-BR'); // DD/MM/AAAA
+    const dataPedido = new Date().toISOString().split('T')[0]; // AAAA-MM-DD
     const status = 0; // Pedido ainda não confirmado
     const observacoes = ""; // vazio por padrão
 
@@ -212,7 +212,7 @@ export default function CarrinhoCliente({ empresaId }) {
       const novosItens = itensCarrinho.filter((item) => item.id !== id);
       setItensCarrinho(novosItens);
       const novoSubtotal = novosItens.reduce((acc, item) => acc + item.quantidade * item.produto.preco, 0);
-      setTotalPontosCliente((prev) => prev - pontosGastos + novosPontosGanhos); 
+      //setTotalPontosCliente((prev) => prev - pontosGastos + novosPontosGanhos); 
       setSubtotal(novoSubtotal);
       
       // CORREÇÃO AQUI: Adicione '/loja/' ao caminho da API
