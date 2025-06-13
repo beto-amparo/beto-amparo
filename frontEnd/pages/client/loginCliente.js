@@ -1,17 +1,26 @@
 'use client';
 import Link from 'next/link';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import Image from 'next/image';
 
 export default function LoginPage() {
   const router = useRouter();
+    const [redirectUrl, setRedirectUrl] = useState('/');
+
   const [formData, setFormData] = useState({
     email: '',
     senha: ''
   });
   const [erros, setErros] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (router.isReady) {
+      const { redirect } = router.query;
+      setRedirectUrl(typeof redirect === 'string' ? redirect : '/');
+    }
+  }, [router.isReady, router.query]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -46,7 +55,7 @@ export default function LoginPage() {
       }
 
       alert('Login realizado com sucesso!');
-      window.location.href = 'home';
+      router.push(redirectUrl).then(() => window.location.reload());
     } catch (err) {
       console.error(err);
       setErrors({ geral: 'Erro ao fazer login. Tente novamente mais tarde.' });

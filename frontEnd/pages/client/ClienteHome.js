@@ -1,11 +1,12 @@
 // frontEnd/pages/client/ClienteHome.js
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import NavBar from "@/components/NavBar";
 import ProdutoCard from "@/components/ProdutoCard";
 import { useRouter } from 'next/router';
 import { createClient } from '@supabase/supabase-js';
+import { Menu } from '@headlessui/react';
 
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_KEY);
 
@@ -13,6 +14,8 @@ const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.
 export default function ClienteHome() {
     const router = useRouter();
     const { site } = router.query; // 'site' é o slug da loja
+    const [clienteLogado, setClienteLogado] = useState(false);
+    const [cliente, setCliente] = useState(null);
 
     const [lojaId, setLojaId] = useState(null);
     const [nomeFantasia, setNomeFantasia] = useState("Carregando...");
@@ -54,6 +57,31 @@ export default function ClienteHome() {
     const [fotoLoja, setFotoLoja] = useState(null);
     const [corPrimaria, setCorPrimaria] = useState("#3B82F6");
     const [corSecundaria, setCorSecundaria] = useState("#F3F4F6");
+    const verificarLoginCliente = useCallback(async () => {
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_EMPRESA_API}/me`, {
+                credentials: 'include',
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setCliente(data.cliente);
+                setClienteLogado(true);
+            } else {
+                setCliente(null);
+                setClienteLogado(false);
+            }
+        } catch (err) {
+            setCliente(null);
+            setClienteLogado(false);
+        }
+    }, []);
+    useEffect(() => {
+        verificarLoginCliente();
+        window.addEventListener('focus', verificarLoginCliente);
+        return () => {
+            window.removeEventListener('focus', verificarLoginCliente);
+        };
+    }, [verificarLoginCliente]);
 
     useEffect(() => {
         console.log('DEBUG: ClienteHome - useEffect para fetchEmpresa disparado. Site:', site);
@@ -197,28 +225,27 @@ export default function ClienteHome() {
     };
 
     const handleAdicionar = async (produto) => {
-        console.log('DEBUG: ClienteHome - Tentando adicionar produto ao carrinho:', produto.nome);
-        // Impedir adição ao carrinho se o produto estiver indisponível automaticamente (esgotado)
         if (produto.indisponivel_automatico) {
-            console.warn('DEBUG: ClienteHome - Produto indisponível automaticamente. Não adicionando ao carrinho.');
             setMensagem('Produto indisponível no momento.');
             setCorMensagem('text-red-600');
             setTimeout(() => setMensagem(''), 3000);
-            return; // Impede a continuação da função
+            return;
+        }
+
+        const id_cliente = cliente?.id;
+        
+        if (!id_cliente) {
+            router.push(`/login?redirect=${encodeURIComponent(router.asPath)}`);
+            return;
         }
 
         try {
-            const id_cliente = 30; // ID do cliente hardcoded - ajustar para obter do auth do cliente
             const qtd = quantidades[produto.id] || 1;
-
             const url = `${process.env.NEXT_PUBLIC_EMPRESA_API}/loja/${site}/carrinho`;
-            console.log('DEBUG: ClienteHome - Enviando para API do carrinho:', url, 'Dados:', { produtoId: produto.id, quantidade: qtd, id_cliente, lojaId: lojaId });
 
             const response = await fetch(url, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     produtoId: produto.id,
                     quantidade: qtd,
@@ -228,27 +255,31 @@ export default function ClienteHome() {
             });
 
             const data = await response.json();
-            console.log('DEBUG: ClienteHome - Resposta da API do carrinho:', response.status, data);
 
             if (!response.ok) {
-                if (response.status === 400 && data.erro && data.erro.includes('estoque')) {
-                    console.error('DEBUG: ClienteHome - Erro de estoque ao adicionar ao carrinho:', data.erro);
-                    throw new Error(data.erro);
-                }
-                console.error('DEBUG: ClienteHome - Erro desconhecido ao adicionar ao carrinho:', data.erro || response.statusText);
                 throw new Error(data.erro || 'Erro desconhecido ao adicionar ao carrinho');
             }
 
             setMensagem('Produto adicionado ao carrinho!');
             setCorMensagem('text-green-600');
-            console.log('DEBUG: ClienteHome - Produto adicionado ao carrinho com sucesso.');
         } catch (err) {
-            console.error('DEBUG: ClienteHome - Erro ao adicionar ao carrinho (catch):', err);
             setMensagem(`Erro: ${err.message}`);
             setCorMensagem('text-red-600');
         }
 
         setTimeout(() => setMensagem(''), 3000);
+    };
+    const handleLogout = async () => {
+        try {
+            await fetch(`${process.env.NEXT_PUBLIC_EMPRESA_API}/clientLogout`, {
+                method: 'GET',
+                credentials: 'include',
+            });
+        } catch (error) {
+            console.error('Erro ao fazer logout:', error);
+        } finally {
+            location.reload();
+        }
     };
 
     return (
@@ -332,7 +363,53 @@ export default function ClienteHome() {
                             </div>
                             <span className="text-[10px] mt-1">Compartilhar</span>
                         </button>
-                        {ativarFidelidade && <PontosFidelidade clienteId={30} />}
+                        {clienteLogado ? (
+                            <Menu as="div" className="relative">
+                                <Menu.Button className="flex flex-col items-center cursor-pointer">
+                                    <div className="bg-white p-2 rounded-full shadow hover:bg-gray-100 transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill={corPrimaria} viewBox="0 0 24 24">
+                                            <path d="M12 12c2.67 0 8 1.34 8 4v2H4v-2c0-2.66 5.33-4 8-4zm0-2a2 2 0 100-4 2 2 0 000 4z"/>
+                                        </svg>
+                                    </div>
+                                    <span className="text-[10px] mt-1">Conta</span>
+                                </Menu.Button>
+                                <Menu.Items className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-md z-50">
+                                    <Menu.Item>
+                                        {({ active }) => (
+                                            <button
+                                                onClick={() => router.push(`/cliente/cupons`)}
+                                                className={`block px-4 py-2 w-full text-black text-left text-sm ${active ? 'bg-gray-100' : ''}`}
+                                            >
+                                                Meus Cupons
+                                            </button>
+                                        )}
+                                    </Menu.Item>
+                                    <Menu.Item>
+                                        {({ active }) => (
+                                            <button
+                                                onClick={handleLogout}
+                                                className={`block px-4 py-2 w-full text-left text-sm text-red-600 ${active ? 'bg-red-100' : ''}`}
+                                            >
+                                                Sair
+                                            </button>
+                                        )}
+                                    </Menu.Item>
+                                </Menu.Items>
+                            </Menu>
+                        ) : (
+                            <button
+                                onClick={() => router.push(`/login?redirect=${encodeURIComponent(router.asPath)}`)}
+                                className="flex flex-col items-center cursor-pointer"
+                            >
+                                <div className="bg-white p-2 rounded-full shadow hover:bg-gray-100 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill={corPrimaria} viewBox="0 0 24 24">
+                                        <path d="M12 12c2.67 0 8 1.34 8 4v2H4v-2c0-2.66 5.33-4 8-4zm0-2a2 2 0 100-4 2 2 0 000 4z"/>
+                                    </svg>
+                                </div>
+                                <span className="text-[10px] mt-1">Entrar</span>
+                            </button>
+                        )}
+                        {ativarFidelidade && <PontosFidelidade clienteId={cliente?.id} />}
                     </div>
                 )}
             </header>

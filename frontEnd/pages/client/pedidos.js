@@ -8,12 +8,12 @@ export default function Pedidos() {
   const { slug } = router.query;
 
   const [pedidos, setPedidos] = useState([]);
-  const [corPrimaria, setCorPrimaria] = useState("#3B82F6"); // Valor padrão
-  const [corSecundaria, setCorSecundaria] = useState("#F3F4F6"); // Valor padrão
+  const [corPrimaria, setCorPrimaria] = useState("#3B82F6");
+  const [corSecundaria, setCorSecundaria] = useState("#F3F4F6");
   const [nome_fantasia, setNomeFantasia] = useState("");
   const [pedidoSelecionado, setPedidoSelecionado] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const id_cliente = 30; // depois tornar dinâmico
+  const [cliente, setCliente] = useState(null);
 
   const getContrastColor = (hexColor) => {
     const r = parseInt(hexColor.slice(1, 3), 16);
@@ -23,38 +23,65 @@ export default function Pedidos() {
     return brightness > 128 ? '#000000' : '#FFFFFF';
   };
 
-  const fetchPedidos = async () => {
-    try {
-      const res = await fetch(`http://localhost:4000/loja/${slug}/pedidos?cliente_id=${id_cliente}`);
-      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-      const data = await res.json();
-      setPedidos(data);
-    } catch (error) {
-      console.error("Erro ao buscar pedidos:", error);
-    }
-  };
-
+  
   useEffect(() => {
-    if (!slug) return;
+		if (!slug) return;
 
-    async function fetchLoja() {
-      try {
-        const url = `http://localhost:4000/loja/slug/${slug}`;
-        const response = await fetch(url);
-        if (!response.ok) throw new Error("Erro ao buscar loja");
-        const data = await response.json();
-        setCorPrimaria(data.cor_primaria || "#3B82F6");
-        setCorSecundaria(data.cor_secundaria || "#F3F4F6");
-        setNomeFantasia(data.nome_fantasia || slug);
-      } catch (error) {
-        console.error("Erro ao buscar loja:", error);
-        setCorPrimaria("#3B82F6");
-      }
-    }
+		async function verificarLoginCliente() {
+			try {
+				const response = await fetch(`${process.env.NEXT_PUBLIC_EMPRESA_API}/me`, {
+					credentials: 'include',
+				});
 
-    fetchLoja();
-    fetchPedidos();
-  }, [slug]);
+				if (response.ok) {
+					const data = await response.json();
+					setCliente(data.cliente);
+				} else {
+					router.push(`/login?redirect=${encodeURIComponent(router.asPath)}`);
+				}
+			} catch (err) {
+				console.error("Erro ao verificar login", err);
+				router.push(`/login?redirect=${encodeURIComponent(router.asPath)}`);
+			}
+		}
+
+		verificarLoginCliente();
+	}, [slug, router]);
+
+	useEffect(() => {
+		if (!slug || !cliente) return;
+
+		async function fetchLoja() {
+			try {
+				const url = `${process.env.NEXT_PUBLIC_EMPRESA_API}/loja/slug/${slug}`;
+				const response = await fetch(url);
+				if (!response.ok) throw new Error("Erro ao buscar loja");
+				const data = await response.json();
+				setCorPrimaria(data.cor_primaria || "#3B82F6");
+				setCorSecundaria(data.cor_secundaria || "#F3F4F6");
+				setNomeFantasia(data.nome_fantasia || slug);
+			} catch (error) {
+				console.error("Erro ao buscar loja:", error);
+			}
+		}
+
+		async function fetchPedidos() {
+			try {
+				const res = await fetch(`${process.env.NEXT_PUBLIC_EMPRESA_API}/${slug}/pedidos?cliente_id=${cliente.id}`, {
+					method: "GET",
+					credentials: 'include',
+				});
+				if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+				const data = await res.json();
+				setPedidos(data);
+			} catch (error) {
+				console.error("Erro ao buscar pedidos:", error);
+			}
+		}
+
+		fetchLoja();
+		fetchPedidos();
+	}, [slug, cliente]);
 
   const traduzirStatus = (status) => {
     switch (status) {
@@ -79,43 +106,36 @@ export default function Pedidos() {
       default:
         return 'Status desconhecido';
     }
-
   }
 
-
   const abrirModalCancelamento = (pedido) => {
-    setPedidoSelecionado(pedido); // passa o pedido inteiro
+    setPedidoSelecionado(pedido);
     setShowModal(true);
   };
 
-
-  if (!slug) return <p className="text-black text-center mt-10">Carregando...</p>;
+  if (!cliente) {
+		return <p className="text-black text-center mt-10">Carregando...</p>;
+	}
 
   const textColor = getContrastColor(corPrimaria);
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
-      {/* Barra superior */}
-      <header
-        className="px-4 py-3 flex items-center justify-center shadow"
-        style={{ backgroundColor: corPrimaria, color: textColor }}
-      >
+      <header className="px-4 py-3 flex items-center justify-center shadow"
+        style={{ backgroundColor: corPrimaria, color: textColor }}>
         <h1 className="text-xl font-bold" style={{ color: textColor }}>
           Seus pedidos em {nome_fantasia || slug}
         </h1>
       </header>
 
-      {/* Conteúdo principal */}
       <main className="flex-1 p-4 pb-28 flex flex-col items-center">
         {pedidos.length === 0 ? (
           <p className="text-black text-center text-lg mt-10">Você ainda não fez pedidos.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-4xl">
-              {pedidos.map((pedido) => (
-              <div
-                key={pedido.id}
-                className="bg-white border border-gray-300 rounded-md p-4 w-full text-black shadow"
-              >
+            {pedidos.map((pedido) => (
+              <div key={pedido.id}
+                className="bg-white border border-gray-300 rounded-md p-4 w-full text-black shadow">
                 <p><strong>ID do pedido:</strong> {pedido.id}</p>
                 <p><strong>Data:</strong> {pedido.data}</p>
                 <p><strong>Total:</strong> R$ {(Number(pedido.total) || 0).toFixed(2)}</p>
@@ -148,11 +168,9 @@ export default function Pedidos() {
             clienteId={pedidoSelecionado.cliente_id}
             onClose={() => {
               setShowModal(false);
-              fetchPedidos(); // Atualiza a lista de pedidos após cancelamento
+              fetchPedidos();
             }}
           />
-
-
         )}
       </main>
 
