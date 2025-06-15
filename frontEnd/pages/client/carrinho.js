@@ -21,9 +21,13 @@ export default function CarrinhoCliente({ empresaId }) {
   const router = useRouter();
   const { slug } = router.query;
   
+  // CÓDIGO CORRIGIDO - Substitua o seu useEffect por estes dois
+
+  // Efeito 1: Busca dados da loja, do carrinho e verifica o login do cliente
   useEffect(() => {
     if (!slug) return;
 
+    // Função que verifica se o cliente está logado
     async function verificarLoginCliente() {
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_EMPRESA_API}/me`, {
@@ -31,7 +35,7 @@ export default function CarrinhoCliente({ empresaId }) {
         });
         if (response.ok) {
           const data = await response.json();
-          setCliente(data.cliente);
+          setCliente(data.cliente); // Define o cliente no estado
         } else {
           router.push(`/login?redirect=${encodeURIComponent(router.asPath)}`);
         }
@@ -41,34 +45,28 @@ export default function CarrinhoCliente({ empresaId }) {
       }
     } 
 
-    // Buscar a corPrimaria da loja
+    // Função que busca dados da loja
     async function fetchLoja() {
-      
       try {
         const url = `${process.env.NEXT_PUBLIC_EMPRESA_API}/loja/slug/${slug}`;
         const response = await fetch(url);
         if (!response.ok) throw new Error("Erro ao buscar loja");
         const data = await response.json();
-        setCorPrimaria(data.cor_primaria || "#3B82F6"); // Atualiza com a cor da API ou usa o fallback
+        setCorPrimaria(data.cor_primaria || "#3B82F6");
         setLojaId(data.id);
         setAtivarFidelidade(data.ativarFidelidade || false);
       } catch (error) {
         console.error("Erro ao buscar loja:", error);
-        setCorPrimaria("#3B82F6"); // Fallback em caso de erro
       }
     }   
     
-    // Buscar itens do carrinho
+    // Função que busca itens do carrinho
     async function fetchCarrinho() {
       try {
-        // CORREÇÃO AQUI: Adicione '/loja/' ao caminho da API
         const url = `${process.env.NEXT_PUBLIC_EMPRESA_API}/loja/${slug}/carrinho`; 
-        console.log("Buscando carrinho em:", url); 
         const response = await fetch(url);
         if (!response.ok) throw new Error("Erro ao buscar carrinho");
         const data = await response.json();
-        console.log("Carrinho carregado:", data);
-        console.log("Campo ativarFidelidade vindo como:", data.ativarFidelidade);
         setItensCarrinho(data);
         const total = data.reduce((acc, item) => acc + item.quantidade * item.produto.preco, 0);
         setSubtotal(total);
@@ -77,26 +75,35 @@ export default function CarrinhoCliente({ empresaId }) {
       }
     }
 
+    // Executa as funções
+    verificarLoginCliente();
+    fetchLoja();
+    fetchCarrinho();
+  }, [slug, router]); // Adicione 'router' às dependências pois é usado dentro do efeito
 
-    async function fetchCliente() {
+
+  // Efeito 2: Busca os pontos do cliente DEPOIS que o cliente for identificado
+  useEffect(() => {
+    // Função que busca os dados de pontos do cliente
+    async function fetchClientePontos() {
       try {
-        const id_cliente = cliente?.id; // depois tornar dinâmico
+        const id_cliente = cliente.id; 
         const url = `${process.env.NEXT_PUBLIC_EMPRESA_API}/clientes/${id_cliente}`;
         const response = await fetch(url);
         if (!response.ok) throw new Error("Erro ao buscar cliente");
         const data = await response.json();
         setTotalPontosCliente(data.total_pontos || 0);
-        setPontosParaUsar(data.total_pontos || 0); // por padrão usar todos
+        setPontosParaUsar(data.total_pontos || 0);
       } catch (error) {
-        console.error("Erro ao buscar cliente:", error);
+        console.error("Erro ao buscar dados do cliente:", error);
       }
     }
 
-    verificarLoginCliente();
-    fetchCliente();
-    fetchLoja();
-    fetchCarrinho();
-  }, [slug]);
+    // Só executa se 'cliente' não for nulo e tiver um ID
+    if (cliente && cliente.id) {
+      fetchClientePontos();
+    }
+  }, [cliente]); // Este efeito depende do estado 'cliente'
 
   const aplicarDesconto = () => {
     const pontosDisponiveis = Math.min(pontosParaUsar, totalPontosCliente);
