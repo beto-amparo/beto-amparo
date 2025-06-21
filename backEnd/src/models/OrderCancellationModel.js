@@ -29,10 +29,16 @@ const OrderCancellationModel = {
     return data;
   },
 
-  async atualizarStatus(id, status) {
+  async atualizarStatus(id, status, motivo_rejeicao = null) { // Adicionamos o novo parâmetro
+    const updateData = { status };
+
+    if (motivo_rejeicao) {
+        updateData.motivo_rejeicao = motivo_rejeicao;
+    }
+
     const { data, error } = await supabase
       .from('order_cancellations')
-      .update({ status })
+      .update(updateData) // Usa o objeto de atualização dinâmico
       .eq('id', id)
       .select()
       .single();

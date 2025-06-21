@@ -175,8 +175,27 @@ export default function Pedidos() {
                                 <p><strong>Status:</strong> {traduzirStatus(pedido.status)}</p>
                                 <p><strong>Observações:</strong> {pedido.observacoes || 'Nenhuma'}</p>
 
-                                {(['0', '1', '2'].includes(String(pedido.status))) && (
-                                    <div className="mt-4 flex justify-center gap-2">
+                                <div className="mt-4 space-y-3">
+                                    {['0', '1', '2'].includes(String(pedido.status)) && (
+                                        <>
+                                            {pedido.cancellation_status === 'pendente' ? (
+                                                <div className="p-2 w-full text-center bg-yellow-100 border border-yellow-200 text-yellow-800 rounded-md text-sm">
+                                                    Cancelamento solicitado, aguardando aprovação.
+                                                </div>
+                                            ) : pedido.cancellation_status === 'rejeitado' && (
+                                                <div className="p-3 w-full text-left bg-red-100 border-l-4 border-red-500 text-red-800 rounded-md text-sm">
+                                                    <p className="font-bold">Sua solicitação de cancelamento foi rejeitada.</p>
+                                                    {pedido.rejection_reason && (
+                                                        <p className="mt-1 text-xs italic">Motivo do estabelecimento: "{pedido.rejection_reason}"</p>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </>
+                                    )}
+
+                                    {/* Linha de botões de ação */}
+                                    <div className="flex justify-center items-center gap-3">
+                                        {/* O botão de DETALHES agora está fora da condição e sempre será exibido */}
                                         <button
                                             onClick={() => abrirModalDetalhes(pedido)}
                                             className="px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 border"
@@ -188,19 +207,17 @@ export default function Pedidos() {
                                         >
                                             Detalhes do pedido
                                         </button>
-                                        <button
-                                            onClick={() => abrirModalCancelamento(pedido)}
-                                            className="px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 border"
-                                            style={{
-                                                backgroundColor: corSecundaria,
-                                                color: getContrastColor(corSecundaria),
-                                                borderColor: corSecundaria
-                                            }}
-                                        >
-                                            Cancelar pedido
-                                        </button>
+
+                                        {['0', '1'].includes(String(pedido.status)) && pedido.cancellation_status !== 'pendente' && (
+                                            <button
+                                                onClick={() => abrirModalCancelamento(pedido)}
+                                                className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors duration-200"
+                                            >
+                                                Cancelar pedido
+                                            </button>
+                                        )}
                                     </div>
-                                )}
+                                </div>
                             </div>
                         ))}
                     </div>

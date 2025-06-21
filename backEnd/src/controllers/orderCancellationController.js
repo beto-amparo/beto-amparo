@@ -20,7 +20,7 @@ const orderCancellationController = {
       }
 
       const statusNum = Number(pedido.status);
-      const statusPermitidos = [0, 1, 2];
+      const statusPermitidos = [0, 1];
       if (!statusPermitidos.includes(statusNum)) {
         return res.status(400).json({ error: "Pedido não pode ser cancelado nesse status." });
       }
@@ -51,28 +51,25 @@ const orderCancellationController = {
     }
   },
 
-  // Admin aprova ou rejeita a solicitação
   async atualizarStatus(req, res) {
     try {
-      const { id } = req.params; // ID da *solicitação de cancelamento*
-      const { status } = req.body; // 'aprovado' ou 'rejeitado'
+      const { id } = req.params;
+      const { status, motivo_rejeicao } = req.body; 
 
       if (!['aprovado', 'rejeitado'].includes(status)) {
         return res.status(400).json({ error: 'Status inválido.' });
       }
 
-      // 1. Atualiza o status da SOLICITAÇÃO ('pendente' -> 'aprovado'/'rejeitado')
-      const updatedCancellationRequest = await OrderCancellationModel.atualizarStatus(id, status);
+      // MUDANÇA 2: Passa o 'motivo_rejeicao' para a função do Model
+      const updatedCancellationRequest = await OrderCancellationModel.atualizarStatus(id, status, motivo_rejeicao);
       
       if (!updatedCancellationRequest) {
           return res.status(404).json({ error: 'Solicitação de cancelamento não encontrada.' });
       }
 
-      // 2. SE APROVADO, atualiza o status do PEDIDO
       if (status === 'aprovado') {
-        // O seu model retorna o `order_id`, então podemos usá-lo aqui.
         const order_id = updatedCancellationRequest.order_id; 
-        await atualizarStatusPedido(order_id, 5); // Status 5 = Cancelado
+        await atualizarStatusPedido(order_id, 5);
       }
 
       res.status(200).json(updatedCancellationRequest);
@@ -85,7 +82,6 @@ const orderCancellationController = {
       try {
           const { slug } = req.params;
 
-          // CONSULTA FINAL E CORRIGIDA
           const { data, error } = await supabase
               .from('order_cancellations')
               .select(`

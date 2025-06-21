@@ -16,38 +16,62 @@ async function getEmpresaIdFromToken(req) {
   }
 }
 
+// controllers/pedidoController.js
+
 export const listarPedidosPorCliente = async (req, res) => {
     const { slug, clienteId } = req.params;
 
     try {
+        // Busca o ID da loja pelo slug
+        // A CORREÇÃO ESTÁ AQUI: Voltamos para 'loja' em minúsculo
         const { data: loja, error: lojaError } = await supabase
-            .from('loja')
+            .from('loja') 
             .select('id')
-            .eq('slug_loja', slug) // Use o slug recebido
+            .eq('slug_loja', slug)
             .single();
 
         if (lojaError || !loja) {
+            // Este é o erro que você está recebendo
             return res.status(404).json({ erro: 'Loja não encontrada' });
         }
 
+        // O resto da nossa lógica, que já está correta, continua
         const { data: pedidos, error } = await supabase
             .from('pedidos')
-            .select('*')
+            .select(`
+                *,
+                order_cancellations!left ( status, motivo_rejeicao )
+            `)
             .eq('id_loja', loja.id)
-            .eq('id_cliente', clienteId);
+            .eq('id_cliente', clienteId)
+            .order('data', { ascending: false });
 
         if (error) {
             console.error("Erro ao buscar pedidos do cliente:", error);
             return res.status(500).json({ erro: 'Erro ao buscar pedidos' });
         }
+        
+        const pedidosFormatados = pedidos.map(pedido => {
+          const cancellation_data = (Array.isArray(pedido.order_cancellations) && pedido.order_cancellations.length > 0)
+              ? pedido.order_cancellations[0]
+              : {};
 
-        res.status(200).json(pedidos);
+          delete pedido.order_cancellations;
+          return {
+              ...pedido,
+              cancellation_status: cancellation_data.status || null,
+              rejection_reason: cancellation_data.motivo_rejeicao || null, // <--- NOVO CAMPO
+          };
+      });
+
+
+        res.status(200).json(pedidosFormatados);
+
     } catch (error) {
-        console.error("Erro interno no servidor:", error);
+        console.error("Erro interno no servidor em listarPedidosPorCliente:", error);
         res.status(500).json({ erro: 'Erro interno no servidor' });
     }
 };
-
 
 export const getItensDoPedido = async (req, res) => {
   const { idPedido } = req.params;
