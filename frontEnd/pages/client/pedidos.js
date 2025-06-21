@@ -209,7 +209,7 @@ export default function Pedidos() {
                 {showModal && (
                     <CancelarPedidoModal
                         pedidoId={pedidoSelecionado.id}
-                        clienteId={pedidoSelecionado.cliente_id}
+                        clienteId={cliente.id}
                         onClose={() => {
                             setShowModal(false);
                             fetchPedidos(); // Now fetchPedidos is accessible and will re-fetch

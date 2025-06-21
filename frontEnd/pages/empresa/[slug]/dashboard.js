@@ -8,6 +8,7 @@ import OwnerSidebar from '@/components/OwnerSidebar';
 import HistoricoVendasTable from '@/components/HistoricoVendasTable';
 import VendasChart from '@/components/VendasChart';
 import ControleEstoqueTable from '@/components/ControleEstoqueTable';
+import CancelamentosPendentesTable from '@/components/CancelamentosPendentesTable';
 
 
 export default function DashboardPage() {
@@ -28,6 +29,12 @@ export default function DashboardPage() {
   const [errorPedidos, setErrorPedidos] = useState(null);
   const [errorGrafico, setErrorGrafico] = useState(null);
   const [errorEstoque, setErrorEstoque] = useState(null);
+
+  //Estados para as solicitações de cancelamento
+  const [cancelamentos, setCancelamentos] = useState([]);
+  const [loadingCancelamentos, setLoadingCancelamentos] = useState(true);
+  const [errorCancelamentos, setErrorCancelamentos] = useState(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // NOVO: Adicione um estado para o ID da empresa (virá do token)
   const [autenticatedEmpresaId, setAutenticatedEmpresaId] = useState(null);
@@ -140,11 +147,23 @@ export default function DashboardPage() {
         } finally {
             setLoadingEstoque(false);
         }
+
+        setLoadingCancelamentos(true);
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_EMPRESA_API}/order-cancellations/loja/${slug}/pendentes`, { credentials: 'include' });
+                if (!response.ok) throw new Error('Falha ao buscar solicitações');
+                const data = await response.json();
+                setCancelamentos(data);
+            } catch (err) {
+                setErrorCancelamentos(err.message);
+            } finally {
+                setLoadingCancelamentos(false);
+            }
     };
 
     fetchAllDashboardData();
 
-  }, [router.isReady, slug, router]); 
+  }, [router.isReady, slug, router, refreshTrigger]); 
 
   // Função para obter a URL da imagem do produto (para ControleEstoqueTable se ela for usar imagens)
   // Se essa função já existe em outro lugar ou é um helper, pode importá-la.
@@ -176,6 +195,21 @@ export default function DashboardPage() {
             <VendasChart labels={dadosGrafico.labels} totals={dadosGrafico.totals} />
           )}
         </div>
+
+        <div className="mb-8 p-4 border border-orange-300 ...">
+                    <h2 className="text-2xl font-bold text-orange-700 mb-4">⚠️ Solicitações de Cancelamentos</h2>
+                    {loadingCancelamentos ? (
+                        <p>Carregando...</p>
+                    ) : errorCancelamentos ? (
+                        <p className="text-red-500">Erro: {errorCancelamentos}</p>
+                    ) : (
+                        // ---- MUDANÇA 3: Passe a função de SET do gatilho para o filho ----
+                        <CancelamentosPendentesTable
+                            requests={cancelamentos}
+                            onActionComplete={setRefreshTrigger} 
+                        />
+                    )}
+                </div>
 
         {/* Histórico de Pedidos */}
         <div className="mb-8">

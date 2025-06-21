@@ -101,48 +101,33 @@ export async function atualizarStatusPedido(pedidoId, newStatus) {
 }
 export async function listarPedidosDaLoja(idLoja) {
   console.log('DEBUG: PedidoModel: Listando pedidos para loja ID:', idLoja);
-  // REMOVA TODOS OS COMENTÁRIOS E LINHAS EM BRANCO DA STRING 'select'
-  let query = supabase
-      .from('pedidos')
-      .select(`
-          id,
-          data,
-          total,
-          id_cliente,
-          id_loja,
-          status,
-          observacoes,
-          metodo_pagamento,
-          metodo_entrega,
-          endereco_entrega,
-          subtotal,
-          taxa_entrega,
-          desconto,
-          cupom_id,
-          data_finalizacao,
-          data_entrega,
-          pedido_itens (
-              id,
-              quantidade,
-              preco_unitario,
-              produto (id, nome, image)
-          )
-          -- Se você tem uma tabela de clientes e quer o nome/email, adicione aqui:
-          -- clientes (id, nome, email)
-      `)
-      .eq('id_loja', idLoja)
-      .order('data', { ascending: false });
-
-  const { data, error } = await query;
+  
+  const { data, error } = await supabase
+    .from('pedidos')
+    .select(`
+      id,
+      data,
+      total,
+      status,
+      observacoes,
+      clientes ( nome ),
+      pedido_itens (
+        quantidade,
+        preco_unitario,
+        produto ( nome )
+      )
+    `)
+    .eq('id_loja', idLoja)
+    .order('data', { ascending: false });
 
   if (error) {
-      console.error('DEBUG: PedidoModel: Erro ao listar pedidos da loja:', error.message);
-      return { data: null, error };
+    console.error('DEBUG: PedidoModel: Erro ao listar pedidos da loja:', error.message);
+    return { data: null, error };
   }
+  
   console.log('DEBUG: PedidoModel: Pedidos listados com sucesso:', data.length, 'pedidos.');
   return { data, error: null };
 }
-
 export async function getDadosVendasAgregados(idLoja, periodo = 'semana') {
   const { data: pedidos, error } = await supabase
       .from('pedidos')
@@ -166,9 +151,6 @@ export async function getDadosVendasAgregados(idLoja, periodo = 'semana') {
           dadosGrafico[dataKey] = { label: diaSemana, total: 0 };
       }
   } else if (periodo === 'mes') {
-      // Últimos 30 dias (ou por mês do ano)
-      // Isso pode ser mais complexo. Você pode pegar a data de hoje e voltar 30 dias.
-      // Exemplo simplificado para 30 dias:
       for (let i = 0; i < 30; i++) {
           const dataLoop = new Date(hoje);
           dataLoop.setDate(hoje.getDate() - i);
@@ -177,7 +159,6 @@ export async function getDadosVendasAgregados(idLoja, periodo = 'semana') {
           dadosGrafico[dataKey] = { label: dataFormatada, total: 0 };
       }
   }
-  // Você pode expandir para 'ano' ou outros períodos
 
   pedidos.forEach(pedido => {
     const pedidoData = new Date(pedido.data); // 'data' já é um objeto Date se o tipo for timestamp
