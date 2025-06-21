@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { createClient } from '@supabase/supabase-js';
 import axios from 'axios';
+import { temas } from './temas';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -21,6 +22,7 @@ export default function PersonalizacaoLoja() {
     banner: '',
     slogan: '',
     slug_loja: '',
+    tema_visual: '',
   });
 
   const [imagemFotoLoja, setImagemFotoLoja] = useState(null);
@@ -29,25 +31,25 @@ export default function PersonalizacaoLoja() {
   const [erro, setErro] = useState('');
 
   async function uploadImagemSupabase(file, pasta) {
-  setUploading(true);
-  try {
-    const nomeArquivo = `${Date.now()}-${file.name}`;
-    const { data, error } = await supabase.storage.from(pasta).upload(nomeArquivo, file, {
-      cacheControl: '3600',
-      upsert: false,
-    });
+    setUploading(true);
+    try {
+      const nomeArquivo = `${Date.now()}-${file.name}`;
+      const { data, error } = await supabase.storage.from(pasta).upload(nomeArquivo, file, {
+        cacheControl: '3600',
+        upsert: false,
+      });
 
-    if (error) throw error;
+      if (error) throw error;
 
-    const { data: urlData } = supabase.storage.from(pasta).getPublicUrl(nomeArquivo);
-    setUploading(false);
-    return urlData.publicUrl;
-  } catch (error) {
-    setUploading(false);
-    console.error('Erro no upload:', error.message);
-    return null;
+      const { data: urlData } = supabase.storage.from(pasta).getPublicUrl(nomeArquivo);
+      setUploading(false);
+      return urlData.publicUrl;
+    } catch (error) {
+      setUploading(false);
+      console.error('Erro no upload:', error.message);
+      return null;
+    }
   }
-}
   useEffect(() => {
     if (!slug) return;
 
@@ -88,37 +90,37 @@ export default function PersonalizacaoLoja() {
 
 
   async function handleSubmit(e) {
-  e.preventDefault();
+    e.preventDefault();
 
-  try {
-    let urlFotoLoja = dados.foto_loja;
-    let urlBanner = dados.banner;
+    try {
+      let urlFotoLoja = dados.foto_loja;
+      let urlBanner = dados.banner;
 
-    if (imagemFotoLoja) {
-      const url = await uploadImagemSupabase(imagemFotoLoja, 'lojas');
-      if (url) urlFotoLoja = url;
+      if (imagemFotoLoja) {
+        const url = await uploadImagemSupabase(imagemFotoLoja, 'lojas');
+        if (url) urlFotoLoja = url;
+      }
+
+      if (imagemBanner) {
+        const url = await uploadImagemSupabase(imagemBanner, 'lojas', 'banner');
+        if (url) urlBanner = url;
+      }
+
+      const atualizados = {
+        ...dados,
+        foto_loja: urlFotoLoja,
+        banner: urlBanner,
+      };
+
+      await axios.put(`${process.env.NEXT_PUBLIC_EMPRESA_API}/empresa/personalizacao/${slug}`, atualizados);
+
+      alert('Dados atualizados com sucesso!');
+      router.push('/empresa/donoarea');
+    } catch (err) {
+      console.error(err);
+      alert('Erro ao atualizar dados');
     }
-
-    if (imagemBanner) {
-      const url = await uploadImagemSupabase(imagemBanner, 'lojas', 'banner');
-      if (url) urlBanner = url;
-    }
-
-    const atualizados = {
-      ...dados,
-      foto_loja: urlFotoLoja,
-      banner: urlBanner,
-    };
-
-    await axios.put(`${process.env.NEXT_PUBLIC_EMPRESA_API}/empresa/personalizacao/${slug}`, atualizados);
-
-    alert('Dados atualizados com sucesso!');
-    router.push('/empresa/donoarea');
-  } catch (err) {
-    console.error(err);
-    alert('Erro ao atualizar dados');
   }
-}
 
 
   if (carregando) return <p>Carregando...</p>;
@@ -169,53 +171,53 @@ export default function PersonalizacaoLoja() {
             </div>
           </div>
 
-        {/* Foto da loja */}
-        <div>
-          <label>Foto da Loja</label>
-          {(previewFotoLoja || dados.foto_loja) && (
-            <img
-              src={previewFotoLoja || dados.foto_loja}
-              className="w-32 h-32 object-cover rounded-xl mb-2"
-              alt="Foto da loja"
+          {/* Foto da loja */}
+          <div>
+            <label>Foto da Loja</label>
+            {(previewFotoLoja || dados.foto_loja) && (
+              <img
+                src={previewFotoLoja || dados.foto_loja}
+                className="w-32 h-32 object-cover rounded-xl mb-2"
+                alt="Foto da loja"
+              />
+            )}
+            <input
+              id="fotoLojaInput"
+              type="file"
+              style={{ display: 'none' }}
+              onChange={e => handleImageSelect(e, 'foto_loja')}
             />
-          )}
-          <input
-            id="fotoLojaInput"
-            type="file"
-            style={{ display: 'none' }}
-            onChange={e => handleImageSelect(e, 'foto_loja')}
-          />
-          <label
-            htmlFor="fotoLojaInput"
-            className="block w-full bg-gradient-to-r from-[#3681B6] to-[#2e6e99] text-white py-3 rounded-xl text-center cursor-pointer"
-          >
-            Escolher Foto da Loja
-          </label>
-        </div>
+            <label
+              htmlFor="fotoLojaInput"
+              className="block w-full bg-gradient-to-r from-[#3681B6] to-[#2e6e99] text-white py-3 rounded-xl text-center cursor-pointer"
+            >
+              Escolher Foto da Loja
+            </label>
+          </div>
 
           {/* Banner */}
-        <div className="w-full aspect-[3/1] overflow-hidden rounded-xl bg-gray-200 mb-2">
-        {(previewBanner || dados.banner) &&(
-          <img
-            src={previewBanner || dados.banner}
-            alt="Banner"
-            className="w-full h-full object-cover"
-          />
-        )}
-      </div>
+          <div className="w-full aspect-[3/1] overflow-hidden rounded-xl bg-gray-200 mb-2">
+            {(previewBanner || dados.banner) && (
+              <img
+                src={previewBanner || dados.banner}
+                alt="Banner"
+                className="w-full h-full object-cover"
+              />
+            )}
+          </div>
 
-      <input
-        id="bannerInput"
-        type="file"
-        style={{ display: 'none' }}
-        onChange={e => handleImageSelect(e, 'banner')}
-      />
-      <label
-        htmlFor="bannerInput"
-        className="w-full bg-gradient-to-r from-[#3681B6] to-[#2e6e99] text-white py-3 rounded-xl block text-center cursor-pointer"
-      >
-        Escolher Banner
-      </label>
+          <input
+            id="bannerInput"
+            type="file"
+            style={{ display: 'none' }}
+            onChange={e => handleImageSelect(e, 'banner')}
+          />
+          <label
+            htmlFor="bannerInput"
+            className="w-full bg-gradient-to-r from-[#3681B6] to-[#2e6e99] text-white py-3 rounded-xl block text-center cursor-pointer"
+          >
+            Escolher Banner
+          </label>
 
 
           {/* Slug */}
@@ -229,6 +231,33 @@ export default function PersonalizacaoLoja() {
               className="w-full p-3 border rounded-xl"
             />
           </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Tema Visual</label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              <div
+                className={`border p-4 rounded-xl cursor-pointer transition transform hover:scale-105 ${!dados.tema_visual ? 'border-blue-600 ring-2 ring-blue-500' : 'border-gray-300'}`}
+                onClick={() => setDados(prev => ({ ...prev, tema_visual: '' }))}
+              >
+                <div className="w-full h-20 rounded-xl mb-2 bg-gray-200 flex items-center justify-center text-gray-500 text-sm">
+                  Sem Tema
+                </div>
+                <p className="text-center font-semibold">Nenhum</p>
+              </div>
+              {temas && Object.entries(temas).map(([id, tema]) => (
+                <div
+                  key={id}
+                  className={`border p-4 rounded-xl cursor-pointer transition transform hover:scale-105 ${dados.tema_visual === id ? 'border-blue-600 ring-2 ring-blue-500' : 'border-gray-300'
+                    }`}
+                  onClick={() => setDados(prev => ({ ...prev, tema_visual: id }))}
+                >
+                  <div className="w-full h-20 rounded-xl mb-2" style={{ backgroundColor: tema.corPrimaria }}></div>
+                  <p className="text-center font-semibold">{tema.nome}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
 
           <button
             type="submit"

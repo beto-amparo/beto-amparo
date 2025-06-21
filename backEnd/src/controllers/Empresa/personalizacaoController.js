@@ -6,7 +6,7 @@ dotenv.config();
 export const criarPersonalizacao = async (req, res) => {
   try {
     // --- ALTERAÇÃO AQUI: Adicione idEmpresa ao req.body ---
-    const { nomeFantasia, corPrimaria, corSecundaria, slogan, fotoLoja, slugLoja, idEmpresa } = req.body;
+    const { nomeFantasia, corPrimaria, corSecundaria, slogan, fotoLoja, slugLoja, idEmpresa, tema_visual } = req.body;
     // --- FIM DA ALTERAÇÃO ---
     console.log('criarPersonalizacao: Dados recebidos no req.body:', req.body); // ADICIONE ESTE LOG
     console.log('criarPersonalizacao: ID da empresa recebido:', idEmpresa); // ADICIONE ESTE LOG
@@ -38,6 +38,7 @@ export const criarPersonalizacao = async (req, res) => {
         // --- ALTERAÇÃO AQUI: Adicione id_empresa na inserção ---
         id_empresa: idEmpresa, // Certifique-se de que o nome da coluna no seu DB é 'id_empresa'
         // --- FIM DA ALTERAÇÃO ---
+        tema_visual: tema_visual,
       })
       .select();
 
@@ -120,7 +121,7 @@ export const getLojaBySlug = async (req, res) => {
 export const atualizarPersonalizacao = async (req, res) => {
   try {
     const { slug } = req.params;
-    const { nome_fantasia, cor_primaria, cor_secundaria, slogan, foto_loja, slug_loja, banner } = req.body;
+    const { nome_fantasia, cor_primaria, cor_secundaria, slogan, foto_loja, slug_loja, banner, tema_visual } = req.body;
 
     if (!slug) {
       return res.status(400).json({ mensagem: 'Slug da Loja não fornecido.' });
@@ -137,6 +138,7 @@ export const atualizarPersonalizacao = async (req, res) => {
         foto_loja: foto_loja || null,
         slug_loja: slug_loja,
         banner: banner,
+        tema_visual: tema_visual,
       })
       .eq('slug_loja', slug)
       .select()

@@ -115,7 +115,7 @@ export async function buscarLojaPorSlugCompleta(slug) {
     try {
         const { data, error } = await supabase
             .from('loja')
-            .select('id, nome_fantasia, slug_loja, id_empresa, foto_loja, cor_primaria, cor_secundaria, slogan, banner, ativarFidelidade, valorPonto, is_closed_for_orders')
+            .select('id, nome_fantasia, slug_loja, id_empresa, foto_loja, cor_primaria, cor_secundaria, slogan, banner, ativarFidelidade, valorPonto, is_closed_for_orders, tema_visual')
             .eq('slug_loja', slug)
             .single();
 
