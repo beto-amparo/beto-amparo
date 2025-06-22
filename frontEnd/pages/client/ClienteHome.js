@@ -7,6 +7,7 @@ import ProdutoCard from "@/components/ProdutoCard";
 import { useRouter } from 'next/router';
 import { createClient } from '@supabase/supabase-js';
 import { Menu } from '@headlessui/react';
+import { temas } from '../empresa/[slug]/temas';
 
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_KEY);
 
@@ -38,7 +39,7 @@ export default function ClienteHome() {
         const matchesSearch = removeAccents(produto.nome.toLowerCase()).includes(
             removeAccents(searchTerm.toLowerCase())
         );
-        
+
         const isActuallyAvailableToClient = !produto.indisponivel_automatico;
 
         console.log(`DEBUG: ClienteHome - Filtrando produto ${produto.nome}: matchesSearch=${matchesSearch}, isActuallyAvailableToClient=${isActuallyAvailableToClient}`);
@@ -52,6 +53,7 @@ export default function ClienteHome() {
     const [fotoLoja, setFotoLoja] = useState(null);
     const [corPrimaria, setCorPrimaria] = useState("#3B82F6");
     const [corSecundaria, setCorSecundaria] = useState("#F3F4F6");
+    const [temaVisual, setTemaVisual] = useState('');
 
     const verificarLoginCliente = useCallback(async () => {
         try {
@@ -115,6 +117,7 @@ export default function ClienteHome() {
                 setBannerLoja(data.banner || null);
                 setIsLojaClosed(data.is_closed_for_orders || false); // NOVO: Define o status de fechado/aberto
                 setAtivarFidelidade(data.ativarFidelidade || false);
+                setTemaVisual(data.tema_visual || '');
             } catch (error) {
                 console.error("DEBUG: ClienteHome - Erro na requisição ao buscar empresa:", error.message || error);
                 setNomeFantasia("Erro ao carregar");
@@ -124,6 +127,18 @@ export default function ClienteHome() {
         fetchEmpresa();
     }, [site]);
 
+    const temaSelecionado = temaVisual && temas[temaVisual] ? temas[temaVisual] : null;
+    
+    useEffect(() => {
+        if (temaSelecionado) {
+            setCorPrimaria(temaSelecionado.corPrimaria);
+            setCorSecundaria(temaSelecionado.corSecundaria);
+            document.body.style.fontFamily = temaSelecionado.fonte;
+        } else {
+            // Caso não tenha tema, reseta fonte padrão
+            document.body.style.fontFamily = '';
+        }
+    }, [temaSelecionado]);
 
     useEffect(() => {
         console.log('DEBUG: ClienteHome - useEffect para fetchProdutos disparado. Site:', site);
@@ -143,7 +158,7 @@ export default function ClienteHome() {
 
                 const data = await response.json();
                 console.log('DEBUG: ClienteHome - Produtos brutos recebidos da API:', data);
-                
+
                 if (Array.isArray(data)) {
                     setProdutos(data);
                 } else if (data && Array.isArray(data.produtos)) {
@@ -222,7 +237,7 @@ export default function ClienteHome() {
 
     const handleAdicionar = async (produto) => {
         console.log('DEBUG: ClienteHome - Tentando adicionar produto ao carrinho:', produto.nome);
-        
+
         // Impedir adição ao carrinho e mostrar aviso suave se a loja estiver fechada
         if (isLojaClosed) {
             setMensagem('Desculpe, a loja está fechada para pedidos no momento.');
@@ -240,7 +255,7 @@ export default function ClienteHome() {
         }
 
         const id_cliente = cliente?.id;
-        
+
         if (!id_cliente) {
             router.push(`/login?redirect=${encodeURIComponent(router.asPath)}`);
             return;
@@ -386,7 +401,7 @@ export default function ClienteHome() {
                                 <Menu.Button className="flex flex-col items-center cursor-pointer">
                                     <div className="bg-white p-2 rounded-full shadow hover:bg-gray-100 transition-colors">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill={corPrimaria} viewBox="0 0 24 24">
-                                            <path d="M12 12c2.67 0 8 1.34 8 4v2H4v-2c0-2.66 5.33-4 8-4zm0-2a2 2 0 100-4 2 2 0 000 4z"/>
+                                            <path d="M12 12c2.67 0 8 1.34 8 4v2H4v-2c0-2.66 5.33-4 8-4zm0-2a2 2 0 100-4 2 2 0 000 4z" />
                                         </svg>
                                     </div>
                                     <span className="text-[10px] mt-1">Conta</span>
@@ -421,7 +436,7 @@ export default function ClienteHome() {
                             >
                                 <div className="bg-white p-2 rounded-full shadow hover:bg-gray-100 transition-colors">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill={corPrimaria} viewBox="0 0 24 24">
-                                        <path d="M12 12c2.67 0 8 1.34 8 4v2H4v-2c0-2.66 5.33-4 8-4zm0-2a2 2 0 100-4 2 2 0 000 4z"/>
+                                        <path d="M12 12c2.67 0 8 1.34 8 4v2H4v-2c0-2.66 5.33-4 8-4zm0-2a2 2 0 100-4 2 2 0 000 4z" />
                                     </svg>
                                 </div>
                                 <span className="text-[10px] mt-1">Entrar</span>
@@ -520,7 +535,7 @@ export default function ClienteHome() {
                                 cor={corPrimaria}
                                 // NOVO: Passar status de fechado da loja e indisponibilidade para o ProdutoCard
                                 // isIndisponivel será TRUE se o produto estiver indisponível OU se a loja estiver fechada
-                                isIndisponivel={produto.indisponivel_automatico || isLojaClosed} 
+                                isIndisponivel={produto.indisponivel_automatico || isLojaClosed}
                                 isLojaClosed={isLojaClosed} // Passa o status da loja para o card, para estilo específico
                                 statusEstoque={produto.status_estoque}
                             />
@@ -571,7 +586,7 @@ function PontosFidelidade({ clienteId }) {
 
     return (
         <div className="p-4 border rounded-lg bg-white shadow mb-4">
-             <div className="text-black">Olá, <strong>{nomeCliente}</strong></div>
+            <div className="text-black">Olá, <strong>{nomeCliente}</strong></div>
             <div className="text-black">Você tem <strong>{pontos}</strong> ponto{pontos === 1 ? '' : 's'}</div>
         </div>
     );

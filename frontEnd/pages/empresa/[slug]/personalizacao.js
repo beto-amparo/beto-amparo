@@ -25,6 +25,7 @@ export default function PersonalizacaoLoja() {
     tema_visual: '',
   });
 
+  const temaSelecionado = dados.tema_visual ? temas[dados.tema_visual] : null;
   const [imagemFotoLoja, setImagemFotoLoja] = useState(null);
   const [imagemBanner, setImagemBanner] = useState(null);
   const [carregando, setCarregando] = useState(true);
@@ -127,8 +128,21 @@ export default function PersonalizacaoLoja() {
   if (erro) return <p>{erro}</p>;
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-8">
-      <div className="bg-white rounded-2xl shadow-lg p-6 w-full sm:max-w-3xl text-black">
+    //<div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-8">
+    <div
+      className="min-h-screen flex items-center justify-center px-4 py-8"
+      style={{
+        backgroundColor: temaSelecionado?.corSecundaria || '#f3f4f6', // fallback: bg-gray-100
+        fontFamily: temaSelecionado?.fonte || 'inherit',
+      }}
+    >
+      <div
+        className="rounded-2xl shadow-lg p-6 w-full sm:max-w-3xl text-black"
+        style={{
+          backgroundColor: '#ffffff', // mantém branco
+          border: `2px solid ${temaSelecionado?.corPrimaria || '#3681B6'}`
+        }}
+      >
         <h1 className="text-2xl sm:text-3xl font-semibold text-[#3681B6] mb-6 text-center">
           Editar Informações da Loja
         </h1>
