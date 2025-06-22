@@ -6,6 +6,12 @@ export const temas = {
     corSecundaria: "#FAF3F3",
     fonte: "'Merriweather', serif",
     icones: "natal",
+    iconeSobreLogo: "/icones_temas/gorro-do-papai-noel.png",
+    iconeEstilo: {
+      top: '-8px',
+      left: '-8px',
+      width: '24px',
+    },
   },
   festaJunina: {
     nome: "Festa Junina",
@@ -13,6 +19,13 @@ export const temas = {
     corSecundaria: "#FFF7ED",
     fonte: "'Comic Neue', cursive",
     icones: "junina",
+    iconeSobreLogo: "/icones_temas/chapeu.png",
+    iconeEstilo: {
+      top: '-20px',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      width: '38px',
+    },
   },
   geek: {
     nome: "Geek",
@@ -20,6 +33,13 @@ export const temas = {
     corSecundaria: "#E0E0E0",
     fonte: "'Share Tech Mono', monospace",
     icones: "geek",
+    iconeSobreLogo: "/icones_temas/geek.png",
+    iconeEstilo: {
+      top: '5px',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      width: '38px',
+    },
   },
   praia: {
     nome: "Praia",
@@ -27,13 +47,27 @@ export const temas = {
     corSecundaria: "#CAF0F8",
     fonte: "'Baloo 2', cursive",
     icones: "praia",
+    iconeSobreLogo: "/icones_temas/bola.png",
+    iconeEstilo: {
+      top: '0px',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      width: '38px',
+    },
   },
   halloween: {
     nome: "Halloween",
-    corPrimaria: "#FF7518",
+    corPrimaria: "#4B0082",
     corSecundaria: "#2C2C2C",
     fonte: "'Creepster', cursive",
     icones: "halloween",
+    iconeSobreLogo: "/icones_temas/chapeu_bruxa.png",
+    iconeEstilo: {
+      top: '-20px',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      width: '28px',
+    },
   },
   floresta: {
     nome: "Floresta",
@@ -41,5 +75,12 @@ export const temas = {
     corSecundaria: "#F0FFF0",
     fonte: "'Roboto Slab', serif",
     icones: "floresta",
+    iconeSobreLogo: "/icones_temas/galho.png",
+    iconeEstilo: {
+      top: '-15px',
+      left: '110%',
+      transform: 'translateX(-50%)',
+      width: '28px',
+    },
   },
 };

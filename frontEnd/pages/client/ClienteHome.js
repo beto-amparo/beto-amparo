@@ -128,7 +128,7 @@ export default function ClienteHome() {
     }, [site]);
 
     const temaSelecionado = temaVisual && temas[temaVisual] ? temas[temaVisual] : null;
-    
+
     useEffect(() => {
         if (temaSelecionado) {
             setCorPrimaria(temaSelecionado.corPrimaria);
@@ -323,15 +323,43 @@ export default function ClienteHome() {
             >
                 {!showSearch && (
                     <div className="flex items-center gap-2">
-                        <div className="w-10 h-10 rounded-full overflow-hidden">
-                            <Image
-                                src={fotoLoja ? getImagemProduto(fotoLoja) : "/fallback.png"}
-                                alt="Logo da Loja"
-                                width={50}
-                                height={50}
-                                className="object-cover w-full h-full"
-                            />
+                        <div className="relative w-10 h-10">
+                            {/* Imagem da loja */}
+                            <div className="w-10 h-10 rounded-full overflow-hidden">
+                                <Image
+                                    src={fotoLoja ? getImagemProduto(fotoLoja) : "/fallback.png"}
+                                    alt="Logo da Loja"
+                                    width={50}
+                                    height={50}
+                                    className="object-cover w-full h-full"
+                                />
+                            </div>
+
+                            {/* Ícone decorativo sobre a imagem */}
+                            {temaSelecionado?.iconeSobreLogo && (
+                                <div
+                                    className="absolute"
+                                    style={{
+                                        top: temaSelecionado.iconeEstilo?.top || '-8px',
+                                        left: temaSelecionado.iconeEstilo?.left || '-8px',
+                                        transform: temaSelecionado.iconeEstilo?.transform || 'none',
+                                        width: temaSelecionado.iconeEstilo?.width || '24px',
+                                        height: 'auto',
+                                    }}
+                                >
+                                    <Image
+                                        src={temaSelecionado.iconeSobreLogo}
+                                        alt="Ícone do tema"
+                                        width={0} // obrigatórios para o Next, mas serão ignorados com width via style
+                                        height={0}
+                                        sizes="100vw"
+                                        style={{ width: '100%', height: 'auto' }}
+                                    />
+                                </div>
+                            )}
+
                         </div>
+
                         <h1 className="text-lg font-bold">{nomeFantasia}</h1>
                     </div>
                 )}
