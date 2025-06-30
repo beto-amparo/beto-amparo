@@ -63,6 +63,12 @@ export default function LoginPage() {
     }
   };
 
+  const handleGoogleLogin = () => {
+    const googleLoginUrl = `${process.env.NEXT_PUBLIC_EMPRESA_API}/login/google`;
+    window.location.href = googleLoginUrl;
+  };
+
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-blue-50 bg-opacity-60 backdrop-blur-sm">
       <div className="flex max-w-4xl w-full bg-white rounded-xl shadow-lg overflow-hidden">
@@ -148,7 +154,16 @@ export default function LoginPage() {
 
             </div>
 
-            <div>
+            <div className="space-y-4">
+              <button
+                type="button"
+                onClick={handleGoogleLogin}
+                className="w-full flex items-center justify-center py-3 px-4 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-100"
+              >
+                <Image src="/icons/icon-google.svg" alt="Google" width={20} height={20} className="mr-2" />
+                Entrar com Google
+              </button>
+
               <button
                 type="submit"
                 disabled={isSubmitting}
@@ -157,6 +172,7 @@ export default function LoginPage() {
                 {isSubmitting ? 'Entrando...' : 'Entrar'}
               </button>
             </div>
+
           </form>
 
           <div className="mt-6 text-center">

@@ -4,6 +4,8 @@ import jwt from 'jsonwebtoken';
 import supabase from '../../config/SupaBase.js';
 import Login from '../../models/loginModel.js';
 import Cliente from '../../models/ClienteModel.js';
+import { OAuth2Client } from 'google-auth-library';
+import { buscarClientePorEmail } from '../../models/ClientModel.js';
 
 dotenv.config();
 
@@ -121,14 +123,88 @@ export const cadastrar = async (req, res) => {
 };
 
 export const logout = (req, res) => {
-  
-    res.clearCookie('token_cliente', {
+  res.clearCookie('token_cliente', {
+    httpOnly: false,
+    secure: true,
+    sameSite: 'none',
+    path: '/',
+  });
+
+  res.status(200).send('Logout realizado com sucesso');
+};
+
+// ==========================================
+// ========== LOGIN COM GOOGLE ==============
+// ==========================================
+
+const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI;
+
+const oAuth2Client = new OAuth2Client(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
+
+export const redirecionarGoogleLogin = (req, res) => {
+  const authUrl = oAuth2Client.generateAuthUrl({
+    access_type: 'offline',
+    scope: ['profile', 'email'],
+    prompt: 'consent'
+  });
+  res.redirect(authUrl);
+};
+
+export const callbackGoogleLogin = async (req, res) => {
+  const code = req.query.code;
+
+  try {
+    const { tokens } = await oAuth2Client.getToken(code);
+    oAuth2Client.setCredentials(tokens);
+
+    const ticket = await oAuth2Client.verifyIdToken({
+      idToken: tokens.id_token,
+      audience: CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const email = payload.email;
+    const nome = payload.name;
+
+    // Verifica se o cliente já existe
+    const { data: clienteExistente } = await buscarClientePorEmail(email);
+
+    let cliente = clienteExistente;
+
+    // Se não existe, cria um novo cliente
+    if (!clienteExistente) {
+      const { data, error } = await supabase
+        .from('clientes')
+        .insert([{ email, nome, senha: null }])
+        .select()
+        .single();
+
+      if (error) throw error;
+      cliente = data;
+    }
+
+    // Cria o token
+    const token = jwt.sign(
+      { id: cliente.id, email: cliente.email, tipo: 'cliente' },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    // Define cookie
+    res.cookie('token_cliente', token, {
       httpOnly: false,
-      secure: true, 
-      sameSite: 'none',
+      secure: false,
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
       path: '/',
     });
 
-    res.status(200).send('Logout realizado com sucesso');
-  
+    // Redireciona para o front-end
+    res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
+  } catch (err) {
+    console.error('Erro no login com Google:', err);
+    res.status(500).json({ error: 'Falha na autenticação com o Google' });
+  }
 };

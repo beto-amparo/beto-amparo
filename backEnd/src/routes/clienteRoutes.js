@@ -51,5 +51,9 @@ router.get('/:slug/Horarios',clientePrivate, AgendamentoController.getHoraririos
 router.post('/:slug/agendamento', clientePrivate , AgendamentoController.postAgendamentoController);
 router.get('/cliente/viewAgendamentos/:slug', clientePrivate , AgendamentoController.getAgendamentoByIdController);
 router.put('/cliente/viewAgendamentos/:slug', clientePrivate , AgendamentoController.putAgendamentoCancelamentoController);
+// --- Login com Google ---
+router.get('/login/google', AuthClinteController.redirecionarGoogleLogin);
+router.get('/auth/google/callback', AuthClinteController.callbackGoogleLogin);
+
 
 export default router;
