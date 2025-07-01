@@ -1,0 +1,52 @@
+# node_modules para backend e frontend
+**/node_modules/
+node_modules/
+
+# arquivos de log
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ambiente
+.env
+.env.*.local
+.env.local
+# sistema operacional
+.DS_Store
+Thumbs.db
+
+# build frontend (caso use React, Vue ou similar)
+dist/
+build/
+
+# cache
+.cache/
+.next/
+out/
+.vite/
+coverage/
+
+# IDEs
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# testes
+jest-html-reporters-*.html
+test-report.xml
+
+# arquivos temporários
+*.tmp
+*.swp
+
+# PM2 logs
+pids/
+logs/
+*.pid
+*.seed
+
+# TypeScript
+*.tsbuildinfo

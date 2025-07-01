@@ -1,3 +1,6 @@
 node_modules/
 package-lock.json
 .env
+.env.local
+
+C:\Users\Dallyla\OneDrive\Área de Trabalho\beto-amparo\backEnd\.env

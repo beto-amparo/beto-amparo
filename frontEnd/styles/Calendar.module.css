@@ -1,0 +1,16 @@
+.captionLabel {
+  position: absolute;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1f2937;
+  left:53%;
+  transform: translateX(-55px);
+  bottom: 14rem;
+}
+
+@media (min-width: 430px) and (max-width: 10200px) {
+  .captionLabel {
+    left:9rem;
+    transform: translateX(-70%) !important;
+  }
+}

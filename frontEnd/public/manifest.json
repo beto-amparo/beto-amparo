@@ -1,0 +1,23 @@
+{
+    "name": "Beto Amparo",
+    "short_name": "Beto",
+    "description": "Aplicação PWA da loja Beto Amparo",
+    "icons": [
+      {
+        "src": "logo.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      },
+      {
+        "src": "logo.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ],
+    "start_url": "/empresa/LoginEmpresa",
+    "background_color": "#ffffff",
+    "display": "standalone",
+    "scope": "/empresa/",
+    "theme_color": "#3681B6"
+  }
+  

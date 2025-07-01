@@ -1,3 +1,4 @@
+console.log('DEBUG: Tentando carregar SupaBase.js');
 import { createClient } from '@supabase/supabase-js'
 import dotenv from 'dotenv'
 
