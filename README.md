@@ -198,6 +198,17 @@ Todos os planos contam com **7 dias gratuitos** para experimentação, sem compr
 | Deploy da aplicação Mobile (PWA)       | Fazer o deploy da aplicação Next.js PWA no ambiente de produção                            |    **gabriel martiliano**            |
 | Deploy da aplicação Web Cliente         | Fazer o deploy da aplicação web pública (front da loja, suporte ao cliente, etc.)          |        **Ester**         |
 
+# Iteração 6: Entregáveis Finais com Landing Page, Vídeo, APK e Apresentações
+
+| Dev | Tarefa | Descrição | Dependência | Feito |
+|-----|--------|-----------|-------------|-------|
+| Dallyla | Organizar e Publicar Arquivos no Repositório | Criar pasta `/docs/apresentacoes` no repositório GitHub, organizada por grupo (ex.: `/tecnica`, `/comercial`). Publicar apresentações Técnica e Comercial (.pptx) com documentação do projeto (ex.: README, diagramas). Garantir estrutura clara e acesso público. | Iterações 1-7, Supabase, Dashboard, PWA (Iteração 7) | Não |
+|  | Publicar Landing Page Online | Publicar a Home do Cliente (`fotos/Home%20Sem%20Login.png`) como landing page em `seusite.com` via Vercel Pro, com domínio personalizado. Otimizar para SEO (meta tags, título) e mobile (Tailwind CSS: `flex-col sm:flex-row`). Incluir banner promocional e link para vídeo comercial. Cachear via PWA (`next-pwa`) para acesso offline. | Home do Cliente, PWA, Vercel (Iteração 7, 2, 1) | Não |
+|  | Criar Vídeo Comercial para Landing Page | Produzir vídeo comercial (1-2 min) destacando o Beto Amparo (gestão de pedidos, agendamentos, estoque, personalização). Hospedar no Supabase Storage ou YouTube, embedar na landing page (`/`). Usar ferramentas como Canva ou Adobe Express. Incluir chamada para ação (ex.: “Comece agora!”). Cachear via PWA. | Landing Page, Supabase (Iteração 8, 2) | Não |
+|  | Gerar e Publicar APK do App | Transformar o PWA (`next-pwa`, Iteração 7) em APK para Android usando PWABuilder ou Capacitor. Publicar o APK em `/docs/apk` no repositório, com link para download na landing page. Testar instalação e funcionalidade offline (dashboard, Home do Cliente, agendamentos). | PWA, Landing Page (Iteração 7, 8) | Não |
+|  | Verificar Conteúdo das Apresentações | Revisar slides Técnica e Comercial (.pptx) para garantir: Contextualização (problema dos pequenos negócios), Motivação (solução digital), Visão Geral (funcionalidades: pedidos, estoque, agendamentos), Proposta de Valor (acessibilidade, escalabilidade), Estudo de Mercado (ex.: PMEs no Brasil), Concorrentes (ex.: Wix, Nuvemshop), e extras (ex.: parceria com SEBRAE). Sugerir melhorias (ex.: gráficos, depoimentos). | Apresentações (Iteração 8) | Não |
+| Todos | Testes Manuais e Ajustes | Testar landing page (SEO, responsividade, PWA offline), vídeo (qualidade, embed), APK (instalação, funcionalidade), e slides (clareza, persuasão). Simular fluxos: cliente acessa landing, baixa APK, dono usa dashboard offline. Corrigir bugs e ajustar UI. Garante qualidade final. | Todas | Não |
+
 ## Home 
 ![Home sem login](fotos/Home%20Sem%20Login.png)
 ![Home logado](fotos/Home%20Logado.png)
