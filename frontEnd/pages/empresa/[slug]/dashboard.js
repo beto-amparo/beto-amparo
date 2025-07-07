@@ -126,6 +126,12 @@ export default function DashboardPage() {
     fetchAllDashboardData();
   }, [router.isReady, slug, fetchEmpresaIdFromToken, redirectToLogin]);
 
+
+  }, [router.isReady, slug, router , tipoLoja]); 
+
+  // Função para obter a URL da imagem do produto (para ControleEstoqueTable se ela for usar imagens)
+  // Se essa função já existe em outro lugar ou é um helper, pode importá-la.
+
   const getImagemProduto = (imagePathOrFullUrl) => {
     if (!imagePathOrFullUrl) return '/placeholder.png';
     if (imagePathOrFullUrl.startsWith('http')) return imagePathOrFullUrl;
@@ -133,13 +139,14 @@ export default function DashboardPage() {
     return `${baseUrl}/uploads/produtos/${imagePathOrFullUrl}`;
   };
 
-  if (!router.isReady || tipoLoja === null) {
+  if (!tipoLoja) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-white">
-        <p className="text-gray-700 text-lg">Carregando...</p>
-      </div>
+        <div className="flex justify-center items-center min-h-screen bg-white">
+            <p className="text-gray-700 text-lg">Carregando...</p>
+        </div>
     );
-  }
+}
+
 
   return (
     <OwnerSidebar slug={slug}>
