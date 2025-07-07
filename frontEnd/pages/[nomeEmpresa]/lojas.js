@@ -29,6 +29,8 @@ export default function ListaLojasEmpresa() {
 
 
     useEffect(() => {
+        document.documentElement.style.overflow = 'auto';
+
         if (!nomeEmpresa) return;
 
         async function fetchLojas() {
@@ -153,7 +155,7 @@ export default function ListaLojasEmpresa() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 overflow-y-auto md:overflow-y-visible">
+        <div class="min-h-screen bg-gray-50 overflow-y-auto md:overflow-y-visible">
 
             <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-12">

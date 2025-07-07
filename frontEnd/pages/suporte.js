@@ -46,6 +46,7 @@ export default function Suporte() {
     return newErrors;
   };
   useEffect(() => {
+    document.documentElement.style.overflow = 'auto';
     if (!showSuccessModal) return;
     const timer = setTimeout(() => {
       setShowSuccessModal(false);
