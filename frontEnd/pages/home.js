@@ -18,7 +18,7 @@ export default function Home() {
   }, [imagensHero.length]);
 
   return (
-    <div className="min-h-screen flex flex-col justify-between bg-white text-[#1B1B1B] relative">
+    <div className="min-h-screen flex flex-col justify-between bg-gray-50 text-[#1B1B1B] relative">
       <Navbar />
       <section className="relative w-full h-[500px] lg:h-[600px] flex items-center justify-center text-white overflow-hidden">
         <div className="absolute inset-0 z-0 transition-opacity duration-5000 ease-in-out brightness-[0.5]">
@@ -48,6 +48,20 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+        <section className="w-full max-w-5xl mx-auto my-12 bg-white p-6 rounded-2xl shadow-md text-center">
+          <h2 className="text-2xl md:text-3xl font-bold mb-6 text-[#1B1B1B]">
+            Uma plataforma feita para simplificar seu atendimento
+          </h2>
+          <iframe
+            className="w-full aspect-video rounded-xl"
+            src="https://www.youtube.com/embed/ilpYFOydH80"
+            title="Vídeo promocional Beto Amparo"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </section>
 
       <main className="bg-gray-50 flex flex-col items-center px-6 text-center gap-6 lg:px-32">
         <section className="py-16">
