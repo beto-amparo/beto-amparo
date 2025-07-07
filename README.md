@@ -10,23 +10,29 @@ Projeto de Sistemas
 ## Professor
 Edeílson Milhomem
 <h2>Integrantes do Projeto</h2>
-  <table>
-    <tr>
-      <td>Gabriel Martiliano</td>
-    </tr>
-    <tr>
-      <td>Ester Arraiz de Matos</td>
-    </tr>
-    <tr>
-      <td>Neci Oneides da Silva</td>
-    </tr>
-    <tr>
-      <td>Heloisa Rolins Ribeiro</td>
-    </tr>
-    <tr>
-      <td>Dallyla de Moraes Sousa</td>
-    </tr>
-  </table>
+ <table>
+  <tr>
+    <td><a href="https://github.com/gabrielbdsm" target="_blank">Gabriel Martiliano</a></td>
+  </tr>
+  <tr>
+    <td>Ester Arraiz de Matos</td>
+  </tr>
+  <tr>
+    <td>Neci Oneides da Silva</td>
+  </tr>
+  <tr>
+    <td>Heloisa Rolins Ribeiro</td>
+  </tr>
+  <tr>
+    <td>Dallyla de Moraes Sousa</td>
+  </tr>
+</table>
+
+  
+## 🔗 Link do Projeto
+
+Acesse aqui: [https://beto-amparo.vercel.app/](https://beto-amparo.vercel.app/)
+
 
 ## 📊 Validação da Ideia
 
