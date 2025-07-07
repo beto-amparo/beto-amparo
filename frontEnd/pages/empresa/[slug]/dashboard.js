@@ -124,7 +124,6 @@ export default function DashboardPage() {
     };
 
     fetchAllDashboardData();
-  }, [router.isReady, slug, fetchEmpresaIdFromToken, redirectToLogin]);
 
 
   }, [router.isReady, slug, router , tipoLoja]); 
